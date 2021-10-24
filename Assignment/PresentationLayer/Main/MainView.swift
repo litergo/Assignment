@@ -40,22 +40,29 @@ struct MainView: View {
                    .pickerStyle(.segmented)
                    .frame(height: 30)
                    .padding(.horizontal)
-        
-        List {
-          ForEach(viewModel.filteredEvents) { item in
-            VStack {
-              HStack {
-                Text(item.name)
-                Spacer()
-                if let duration = DateComponentsFormatter.timeIntervalFormatter.string(from: TimeInterval(item.duration)) {
-                  Text(duration)
+        if viewModel.events.isEmpty {
+          Spacer()
+          Text("Your events list is empty. Start by adding some events.")
+            .multilineTextAlignment(.center)
+            .padding()
+          Spacer()
+        } else {
+          List {
+            ForEach(viewModel.filteredEvents) { item in
+              VStack {
+                HStack {
+                  Text(item.name)
+                  Spacer()
+                  if let duration = DateComponentsFormatter.timeIntervalFormatter.string(from: TimeInterval(item.duration)) {
+                    Text(duration)
+                  }
                 }
-              }
-              HStack {
-                Text(item.venue)
-                Spacer()
-                Text(item.inRemote ? "on server": "local")
-                  .foregroundColor(item.inRemote ? Color.blue: Color.gray)
+                HStack {
+                  Text(item.venue)
+                  Spacer()
+                  Text(item.inRemote ? "on server": "local")
+                    .foregroundColor(item.inRemote ? Color.blue: Color.gray)
+                }
               }
             }
           }
