@@ -33,9 +33,11 @@ struct MainView: View {
               }
               HStack {
                 Text(item.venue)
+                  .font(.system(size: 15))
+                  .foregroundColor(.black.opacity(0.5))
                 Spacer()
                 Text(item.inRemote ? "on server": "local")
-                  .foregroundColor(item.inRemote ? Color.blue: Color.gray)
+                  .foregroundColor(item.inRemote ? Color.blue.opacity(0.8): Color.orange.opacity(0.8))
               }
             }
           }

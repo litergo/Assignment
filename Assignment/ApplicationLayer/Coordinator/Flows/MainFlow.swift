@@ -39,9 +39,9 @@ private extension MainFlow {
     let createEventViewModel = CreateEventViewModel()
     var createEvent = CreateEventView(viewModel: createEventViewModel)
     
-    createEventViewModel.finishFlow = { model in
+    createEventViewModel.finishFlow = { [weak self] model in
       viewModel.add(event: model)
-      self.router.dismiss(animated: true, completion: nil)
+      self?.router.dismiss(animated: true, completion: nil)
     }
     
     createEvent.cancelFlow = { [weak self] in

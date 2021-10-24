@@ -18,7 +18,7 @@ struct CreateEventView: View {
   // MARK: Privates
   
   private enum Field: Int, CaseIterable {
-         case name, venue, duration
+    case name, venue, duration
   }
   
   private struct Constants {
@@ -26,7 +26,7 @@ struct CreateEventView: View {
   }
   
   @FocusState private var focusedField: Field?
-
+  
   @ObservedObject private var viewModel: CreateEventViewModel
   
   // MARK: Lifecycle
@@ -38,7 +38,7 @@ struct CreateEventView: View {
   }
   
   var body: some View {
-    VStack {
+    VStack(spacing: 0) {
       HStack {
         Button {
           cancelFlow?()
@@ -49,17 +49,21 @@ struct CreateEventView: View {
       }
       TextField("Enter event name...", text: $viewModel.nameInput)
         .focused($focusedField, equals: .name)
-        .padding(.vertical)
+        .padding(.vertical, 20)
       
       TextField("Enter event venue...", text: $viewModel.venueInput)
         .focused($focusedField, equals: .venue)
-        .padding(.bottom)
+        .padding(.bottom, 20)
       
       TextField("Enter duration in seconds...", text: $viewModel.durationInput)
         .focused($focusedField, equals: .duration)
         .keyboardType(.numberPad)
         .onReceive(Just(viewModel.durationInput)) { text in
-          if text.count > Constants.numbersLimit {
+          let filtered = text.filter { $0.isNumber }
+          if filtered != text {
+            viewModel.durationInput = filtered
+          }
+          if filtered.count > Constants.numbersLimit {
             viewModel.durationInput = String(text.prefix(Constants.numbersLimit))
           }
         }
@@ -73,6 +77,7 @@ struct CreateEventView: View {
       }
       
       Toggle("Save on server", isOn: $viewModel.shouldSaveOnServer)
+        .padding(.top, 15)
       
       Spacer()
       
@@ -89,7 +94,7 @@ struct CreateEventView: View {
         }
       }
       .disabled(!viewModel.isReadyToAdd)
-
+      
     }
     .padding()
     .toolbar {
