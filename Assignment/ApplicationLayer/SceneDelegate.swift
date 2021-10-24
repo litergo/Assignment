@@ -11,6 +11,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   var window: UIWindow?
   var router: Router?
+  var startFlow: BaseFlow?
   
   func scene(_ scene: UIScene,
              willConnectTo session: UISceneSession,
@@ -24,8 +25,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       self.window = window
       window.makeKeyAndVisible()
       if let router = router {
-        let mainFlow = MainFlow(router: router)
-        mainFlow.start()
+        startFlow = MainFlow(router: router)
+        startFlow?.start()
       }
     }
   }

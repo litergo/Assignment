@@ -13,5 +13,12 @@ let project = Project(name: "Assignment",
                                sources: "Assignment/**",
                                resources: resourcesPaths,
                                dependencies: targetDependencies,
-                               coreDataModels: coreDataModels)
+                               coreDataModels: coreDataModels),
+                        Target(name: "AssignmentTests",
+                               platform: .iOS,
+                               product: .unitTests,
+                               bundleId: "ru.mishchenko.dev.tests",
+                               infoPlist: "AssignmentTests/Info.plist",
+                               sources: ["AssignmentTests/**"],
+                               dependencies: [.target(name: "Assignment")])
                       ])

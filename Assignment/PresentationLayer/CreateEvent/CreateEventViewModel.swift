@@ -14,10 +14,18 @@ final class CreateEventViewModel: ObservableObject {
   
   @Published var nameInput: String = ""
   @Published var venueInput: String = ""
-  @Published var durationInput: String = ""
+  @Published var durationFormatted: String?
   @Published var shouldSaveOnServer: Bool = false
-
-  
+  @Published var durationInput: String = ""
+  {
+    didSet {
+      if let intValue = Int(durationInput) {
+        durationFormatted = DateComponentsFormatter.timeIntervalFormatter.string(from: TimeInterval(intValue))
+      } else {
+        durationFormatted = nil
+      }
+    }
+  }
   
   var isReadyToAdd: Bool {
     !nameInput.isEmpty &&

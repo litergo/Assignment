@@ -7,28 +7,70 @@
 //
 
 import SwiftUI
+import Combine
 
 struct CreateEventView: View {
+  
+  // MARK: Public
+  
+  var cancelFlow: (() -> Void)?
+  
+  // MARK: Privates
   
   private enum Field: Int, CaseIterable {
          case name, venue, duration
   }
   
-  @FocusState private var focusedField: Field?
+  private struct Constants {
+    static let numbersLimit = 8
+  }
   
-  @ObservedObject var viewModel: CreateEventViewModel
+  @FocusState private var focusedField: Field?
+
+  @ObservedObject private var viewModel: CreateEventViewModel
+  
+  // MARK: Lifecycle
+  
+  /// Init with view model
+  /// - Parameter viewModel: view model
+  init(viewModel: CreateEventViewModel) {
+    self.viewModel = viewModel
+  }
   
   var body: some View {
     VStack {
-      TextField.init("Enter event name...", text: $viewModel.nameInput)
+      HStack {
+        Button {
+          cancelFlow?()
+        } label: {
+          Text("Cancel")
+        }
+        Spacer()
+      }
+      TextField("Enter event name...", text: $viewModel.nameInput)
         .focused($focusedField, equals: .name)
+        .padding(.vertical)
       
-      TextField.init("Enter event venue...", text: $viewModel.venueInput)
+      TextField("Enter event venue...", text: $viewModel.venueInput)
         .focused($focusedField, equals: .venue)
+        .padding(.bottom)
       
-      TextField.init("Enter event duration...", text: $viewModel.durationInput)
+      TextField("Enter duration in seconds...", text: $viewModel.durationInput)
         .focused($focusedField, equals: .duration)
         .keyboardType(.numberPad)
+        .onReceive(Just(viewModel.durationInput)) { text in
+          if text.count > Constants.numbersLimit {
+            viewModel.durationInput = String(text.prefix(Constants.numbersLimit))
+          }
+        }
+      
+      viewModel.durationFormatted.map { text in
+        HStack {
+          Text(text)
+            .foregroundColor(.gray)
+          Spacer()
+        }
+      }
       
       Toggle("Save on server", isOn: $viewModel.shouldSaveOnServer)
       
@@ -62,4 +104,3 @@ struct CreateEventView: View {
     }
   }
 }
-

@@ -17,6 +17,6 @@ public let resourcesPaths: ResourceFileElements = [
 
 // Модели CoreData
 public let coreDataModels: [CoreDataModel] = [
-  CoreDataModel("Assignment/CoreData/ManagedObjects/SportEvent.xcdatamodeld")
+  CoreDataModel("Assignment/DataLayer/CoreData/ManagedObjects/SportEvent.xcdatamodeld")
 ]
 

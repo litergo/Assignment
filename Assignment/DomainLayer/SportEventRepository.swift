@@ -16,29 +16,40 @@ protocol SportEventRepository {
 class SportEventRepositoryImp {
   
   private let storageService: SportEventStorageService
-  private let firabaseProvider: FirebaseDatabaseProvider
+  private let firebaseProvider: FirebaseDatabaseProvider
   init(storageService: SportEventStorageService,
-       firabaseProvider: FirebaseDatabaseProvider) {
+       firebaseProvider: FirebaseDatabaseProvider) {
     self.storageService = storageService
-    self.firabaseProvider = firabaseProvider
+    self.firebaseProvider = firebaseProvider
   }
 }
 
 extension SportEventRepositoryImp: SportEventRepository {
   func getSportEvents(callback: @escaping Callback<[SportEventModel]>) {
-    let storedEvents = storageService.getSportEvents()
-    firabaseProvider.getEvents {
-      if case let .success(result) = $0 {
-        callback(.success(storedEvents + result))
-      } else {
-        callback(.success(storedEvents))
+    var events: [SportEventModel] = []
+    
+    let storedEventsResult = storageService.getSportEvents()
+    switch storedEventsResult {
+    case .success(let storedEvents):
+      events = storedEvents
+    case .failure(let error):
+      callback(.failure(error))
+      return
+    }
+    
+    firebaseProvider.getEvents { result in
+      switch result {
+      case .success(let firebaseEvents):
+        callback(.success(firebaseEvents + events))
+      case .failure(let error):
+        callback(.failure(error))
       }
     }
   }
   
   func add(sportEvent: SportEventModel) {
     if sportEvent.inRemote {
-      firabaseProvider.add(event: sportEvent)
+      firebaseProvider.add(event: sportEvent)
     } else {
       storageService.add(sportEvent: sportEvent)
     }

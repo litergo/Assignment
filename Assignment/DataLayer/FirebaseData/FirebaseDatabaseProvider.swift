@@ -39,7 +39,11 @@ final class FirebaseDatabaseProviderImp {
 
 extension FirebaseDatabaseProviderImp: FirebaseDatabaseProvider {
   func getEvents(callback: @escaping Callback<[SportEventModel]>)  {
-    reference.getData { _, snapshot in
+    reference.getData { error, snapshot in
+      if let error = error {
+        callback(.failure(error))
+        return
+      }
       var newItems: [SportEventDTO] = []
       for child in snapshot.children {
         if let snapshot = child as? DataSnapshot,

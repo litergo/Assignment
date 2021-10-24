@@ -9,14 +9,20 @@
 import SwiftUI
 
 struct MainView: View {
+  @ObservedObject private var viewModel: MainViewModel
   
-  @ObservedObject var viewModel: MainViewModel
-
+  init(viewModel: MainViewModel) {
+    self.viewModel = viewModel
+  }
+  
   var presentSheet: (() -> Void)?
   
   var body: some View {
       VStack {
         HStack {
+          Text("Events")
+            .font(.system(size: 30))
+            .fontWeight(.bold)
           Spacer()
           Button {
             presentSheet?()
@@ -41,7 +47,9 @@ struct MainView: View {
               HStack {
                 Text(item.name)
                 Spacer()
-                Text("\(item.duration)")
+                if let duration = DateComponentsFormatter.timeIntervalFormatter.string(from: TimeInterval(item.duration)) {
+                  Text(duration)
+                }
               }
               HStack {
                 Text(item.venue)

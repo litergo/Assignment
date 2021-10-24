@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 
 protocol SportEventStorageService {
-  func getSportEvents() -> [SportEventModel]
+  func getSportEvents() -> Result<[SportEventModel], Error>
   func add(sportEvent: SportEventModel)
 }
 
@@ -32,14 +32,17 @@ extension SportEventStorageServiceImp: SportEventStorageService {
     coreDataStack.saveMainContext()
   }
   
-  func getSportEvents() -> [SportEventModel] {
+  func getSportEvents() -> Result<[SportEventModel], Error> {
     let eventFetch: NSFetchRequest<SportEventMO> = SportEventMO.fetchRequest()
-    let results = try? coreDataStack.mainContext.fetch(eventFetch)
-    return results?.map({
-      SportEventModel(name: $0.name ?? "",
-                      venue: $0.venue ?? "",
-                      duration: Int($0.duration),
-                      inRemote: false)
-    }) ?? []
+    do {
+      let results = try coreDataStack.mainContext.fetch(eventFetch)
+      return .success(results.map {
+        SportEventModel(name: $0.name ?? "",
+                        venue: $0.venue ?? "",
+                        duration: Int($0.duration),
+                        inRemote: false)})
+    } catch let error as NSError {
+      return .failure(error)
+    }
   }
 }
