@@ -21,20 +21,22 @@ struct MainView: View {
     VStack {
       header
       List {
-        ForEach(viewModel.filteredEvents) { item in
-          VStack {
-            HStack {
-              Text(item.name)
-              Spacer()
-              if let duration = DateComponentsFormatter.timeIntervalFormatter.string(from: TimeInterval(item.duration)) {
-                Text(duration)
+        if !viewModel.isError && !viewModel.events.isEmpty {
+          ForEach(viewModel.filteredEvents) { item in
+            VStack {
+              HStack {
+                Text(item.name)
+                Spacer()
+                if let duration = DateComponentsFormatter.timeIntervalFormatter.string(from: TimeInterval(item.duration)) {
+                  Text(duration)
+                }
               }
-            }
-            HStack {
-              Text(item.venue)
-              Spacer()
-              Text(item.inRemote ? "on server": "local")
-                .foregroundColor(item.inRemote ? Color.blue: Color.gray)
+              HStack {
+                Text(item.venue)
+                Spacer()
+                Text(item.inRemote ? "on server": "local")
+                  .foregroundColor(item.inRemote ? Color.blue: Color.gray)
+              }
             }
           }
         }
