@@ -12,6 +12,7 @@ final class MainViewModel: ObservableObject {
   
   @Published var events: [SportEventModel] = []
   @Published var selectedStorage = 0
+  @Published var isError: Bool = false
   
   var filteredEvents: [SportEventModel] {
     if selectedStorage == 1 {
@@ -33,11 +34,20 @@ final class MainViewModel: ObservableObject {
 
 extension MainViewModel {
   func fetchEvents() {
-    repository.getSportEvents {
-      if case let .success(result) = $0 {
-        self.events = result
+    repository.getSportEvents { result in
+      switch result {
+      case .success(let events):
+        self.events = events
+      case .failure(let error):
+        self.isError = true
+        print(error.localizedDescription)
       }
     }
+  }
+  
+  func refresh() {
+    isError = false
+    fetchEvents()
   }
   
   func add(event: SportEventModel) {

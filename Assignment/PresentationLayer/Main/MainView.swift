@@ -18,55 +18,71 @@ struct MainView: View {
   var presentSheet: (() -> Void)?
   
   var body: some View {
-      VStack {
-        HStack {
-          Text("Events")
-            .font(.system(size: 30))
-            .fontWeight(.bold)
-          Spacer()
-          Button {
-            presentSheet?()
-          } label: {
-            Image(systemName: "plus")
-          }
-        }
-        .padding()
-        
-        Picker("Select", selection: $viewModel.selectedStorage) {
-                       Text("All").tag(0)
-                       Text("Remote").tag(1)
-                       Text("Local").tag(2)
-                   }
-                   .pickerStyle(.segmented)
-                   .frame(height: 30)
-                   .padding(.horizontal)
-        if viewModel.events.isEmpty {
-          Spacer()
-          Text("Your events list is empty. Start by adding some events.")
-            .multilineTextAlignment(.center)
-            .padding()
-          Spacer()
-        } else {
-          List {
-            ForEach(viewModel.filteredEvents) { item in
-              VStack {
-                HStack {
-                  Text(item.name)
-                  Spacer()
-                  if let duration = DateComponentsFormatter.timeIntervalFormatter.string(from: TimeInterval(item.duration)) {
-                    Text(duration)
-                  }
-                }
-                HStack {
-                  Text(item.venue)
-                  Spacer()
-                  Text(item.inRemote ? "on server": "local")
-                    .foregroundColor(item.inRemote ? Color.blue: Color.gray)
-                }
+    VStack {
+      header
+      List {
+        ForEach(viewModel.filteredEvents) { item in
+          VStack {
+            HStack {
+              Text(item.name)
+              Spacer()
+              if let duration = DateComponentsFormatter.timeIntervalFormatter.string(from: TimeInterval(item.duration)) {
+                Text(duration)
               }
+            }
+            HStack {
+              Text(item.venue)
+              Spacer()
+              Text(item.inRemote ? "on server": "local")
+                .foregroundColor(item.inRemote ? Color.blue: Color.gray)
             }
           }
         }
       }
+      .overlay(listOverlayContent)
+      .refreshable {
+        viewModel.refresh()
+      }
+    }
+  }
+  
+  var listOverlayContent: some View {
+    Group {
+      if viewModel.isError {
+        Text("Sorry :( \n There is some error happened.")
+          .multilineTextAlignment(.center)
+          .padding()
+      } else if viewModel.events.isEmpty {
+        Text("Your events list is empty. Start by adding some events.")
+          .multilineTextAlignment(.center)
+          .padding()
+      }
+    }
+  }
+  
+  @ViewBuilder var header: some View {
+    VStack {
+      HStack {
+        Text("Events")
+          .font(.system(size: 30))
+          .fontWeight(.bold)
+        Spacer()
+        Button {
+          presentSheet?()
+        } label: {
+          Image(systemName: "plus")
+        }
+      }
+      .padding()
+      
+      Picker("Select", selection: $viewModel.selectedStorage) {
+        Text("All").tag(0)
+        Text("Remote").tag(1)
+        Text("Local").tag(2)
+      }
+      .pickerStyle(.segmented)
+      .frame(height: 30)
+      .padding(.horizontal)
+    }
   }
 }
